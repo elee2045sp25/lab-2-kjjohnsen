@@ -16,7 +16,9 @@ void loop() {
   M5.update();
 
   if(Serial.available() > 2){
-    int cpu = Serial.read();
+    unsigned int cpu_low = Serial.read();
+    unsigned int cpu_high = Serial.read();
+    uint16_t cpu = (cpu_high << 8) + cpu_low;
     int mem = Serial.read();
     int bat = Serial.read();
     canvas.clear();

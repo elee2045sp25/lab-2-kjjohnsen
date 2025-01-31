@@ -4,6 +4,7 @@ import psutil
 import time
 import pandas as pd
 import datetime
+import struct
 # list the ports and choose the best one
 ports = serial.tools.list_ports.comports()
 port = None
@@ -43,7 +44,9 @@ while m5stick.is_open: # Loop while we have an open serial connection
         last_read_time = curr_time #remember the last time we read data
 
         # now read the data from psutil (cpu, memory, battery)
-        cpu = int(psutil.cpu_percent())
+        cpu_percent = psutil.cpu_percent(percpu=True)
+        cpu = int(sum(cpu_percent))
+        print(cpu)
         mem = psutil.virtual_memory()
         mem = int(mem.available / mem.total *100)
         battery = 0 
@@ -52,8 +55,8 @@ while m5stick.is_open: # Loop while we have an open serial connection
             battery = psutil.sensors_battery()
             if battery:
                 battery = int(battery.percent)
-
-        m5stick.write(bytearray([cpu,mem,battery])) 
+        
+        m5stick.write(struct.pack("<HBB",cpu,mem,battery)) 
         
     except Exception as e:
         print(e)
