@@ -3,6 +3,13 @@
 
 unsigned long last_message = 0;
 M5Canvas canvas(&M5.Display); // a canvas allows you to do all drawing off-screen, helping to avoid artifacts from drawing while displaying
+
+typedef struct {
+  uint16_t cpu;
+  uint8_t mem;
+  uint8_t battery;
+} StatsPacket;
+
 void setup() {
   M5.begin();
   Serial.begin(115200);
@@ -15,15 +22,12 @@ void loop() {
   // put your main code here, to run repeatedly:
   M5.update();
 
-  if(Serial.available() > 2){
-    unsigned int cpu_low = Serial.read();
-    unsigned int cpu_high = Serial.read();
-    uint16_t cpu = (cpu_high << 8) + cpu_low;
-    int mem = Serial.read();
-    int bat = Serial.read();
+  if(Serial.available() > sizeof(StatsPacket)){
+    StatsPacket packet;
+    Serial.readBytes((uint8_t*)&packet,sizeof(StatsPacket));
     canvas.clear();
     canvas.setCursor(0,10);
-    canvas.printf(" CPU=%d\n MEM=%d\n BAT=%d",cpu,mem,bat);
+    canvas.printf(" CPU=%d\n MEM=%d\n BAT=%d",packet.cpu,packet.mem,packet.battery);
     last_message = millis();
   }
   if(M5.BtnA.wasPressed()){
@@ -34,6 +38,7 @@ void loop() {
   }
   if(M5.BtnB.wasPressed()){
     Serial.write(255);
+    
   }
 
   unsigned long curr_time = millis();
