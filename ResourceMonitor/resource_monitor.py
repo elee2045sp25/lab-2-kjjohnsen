@@ -41,7 +41,7 @@ while m5stick.is_open: # Loop while we have an open serial connection
         curr_time = time.time() 
         if curr_time - last_read_time < 1: continue # we won't do anything until 1s has passed
         
-        last_read_time = curr_time #remember the last time we read data
+        last_read_time = curr_time # remember the last time we read data
 
         # now read the data from psutil (cpu, memory, battery)
         cpu_percent = psutil.cpu_percent(percpu=True)
